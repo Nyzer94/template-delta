@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{TITRE_DU_SITE}}</title>
+    <title>{{TITRE_DU_SITE}} // FLIGHT DECK MASTER</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,15 +168,24 @@
         .alt-tape { right: 0; border-left: 2px solid white; text-align: left; padding-left: 5px; color: var(--color-green); }
         .magenta-bug { color: var(--color-magenta); font-size: 0.7rem; }
 
-        /* Overlay Info */
-        .pilot-info-overlay {
-            z-index: 5; text-align: center;
-            background: rgba(0,0,0,0.7); padding: 15px;
-            border: 1px solid var(--color-cyan); max-width: 85%;
+        .pilot-id-plate {
+            background-color: #111; /* Fond sombre physique */
+            border: 1px solid #333;
+            border-left: 4px solid var(--color-cyan); /* Petite touche de couleur */
+            padding: 10px 15px;
+            margin-top: 10px; /* Espace avec l'écran du dessus */
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px black;
+            flex-shrink: 0; /* Ne doit pas être écrasé */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .pilot-name { font-size: 1.6rem; color: var(--color-white); letter-spacing: 2px; margin-bottom: 5px; }
-        .pilot-role { font-size: 0.9rem; color: var(--color-cyan); margin-bottom: 10px; }
-        .pilot-bio { font-size: 0.8rem; color: var(--color-green); line-height: 1.4; text-align: left; }
+        
+        /* Ajustement du texte à l'intérieur */
+        .pilot-id-plate .pilot-name { font-size: 1.1rem; color: white; letter-spacing: 1px; margin-bottom: 2px; }
+        .pilot-id-plate .pilot-role { font-size: 0.75rem; color: var(--color-cyan); margin-bottom: 5px; text-transform: uppercase; }
+        .pilot-id-plate .pilot-bio { font-size: 0.7rem; color: #888; line-height: 1.3; font-style: italic; }
 
         /* Heading */
         .heading-tape {
@@ -415,14 +424,6 @@
                                 <span class="magenta-bug">FL350</span><span>36000</span><span style="color:var(--color-green);">35500</span><span>35000</span>
                             </div>
 
-                            <div class="pilot-info-overlay">
-                                <div class="pilot-name">{{NOM}}</div>
-                                <div class="pilot-role">{{TITRE_PROFIL}}</div>
-                                <div class="pilot-bio">
-                                    >> {{DESCRIPTION_PROFIL}}
-                                </div>
-                            </div>
-
                             <div class="heading-tape">
                                 <span>W</span> ... <span>300</span> ... <span style="color:var(--color-green);">315</span> ... <span>330</span>
                             </div>
@@ -460,6 +461,14 @@
                         </div>
                     </div>
                     <div style="color:#555; text-align:center; font-size:0.6rem; margin-top:3px;">ND - NAV DISPLAY</div>
+                </div>
+
+                <div class="pilot-id-plate">
+                    <div class="pilot-name">{{NOM}}</div>
+                    <div class="pilot-role">{{TITRE_PROFIL}}</div>
+                    <div class="pilot-bio">
+                        >> {{DESCRIPTION_PROFIL}}
+                    </div>
                 </div>
             </div>
 
