@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{TITRE_DU_SITE}} // FLIGHT DECK MASTER</title>
+    <title>{{TITRE_DU_SITE}}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -284,6 +284,101 @@
         .modal-body { padding: 30px; }
         .cl-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 10px 0; }
         
+        /* =========================================
+           7. ND SCREEN (NAV DISPLAY)
+        ========================================= */
+        /* Conteneur ND */
+        .nd-screen {
+            position: relative;
+            background-color: #000; /* Noir pur */
+            overflow: hidden;
+            font-family: 'B612 Mono', monospace;
+        }
+
+        /* Coins Data */
+        .nd-corner { position: absolute; top: 10px; font-size: 0.75rem; font-weight: bold; z-index: 10; }
+        .nd-corner.top-left { left: 10px; text-align: left; }
+        .nd-corner.top-right { right: 10px; text-align: right; color: var(--color-green); }
+        .nd-corner .label { color: var(--color-white); font-size: 0.6rem; }
+        .nd-corner .value { color: var(--color-green); }
+
+        /* L'Arc de Compas */
+        .compass-arc-container {
+            position: absolute; bottom: -50%; left: 10%; width: 80%; height: 120%;
+            display: flex; justify-content: center;
+        }
+        .compass-arc {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border: 2px solid white; border-radius: 50%;
+            clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%); /* Coupe le bas */
+        }
+        /* Graduations (Ticks) via gradient */
+        .compass-ticks {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            background: repeating-conic-gradient(
+                from -45deg at 50% 50%,
+                transparent 0deg, transparent 4.5deg,
+                white 4.8deg, white 5.2deg,
+                transparent 5.5deg, transparent 10deg
+            );
+            clip-path: polygon(15% 0, 85% 0, 85% 30%, 15% 30%); /* Affiche juste le haut */
+            opacity: 0.8;
+        }
+
+        /* Triangle Cap (Jaune) */
+        .heading-pointer {
+            position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
+            color: #FFD700; font-size: 1.2rem; z-index: 5;
+        }
+
+        /* Chiffres Cap */
+        .heading-text { position: absolute; color: white; font-size: 0.8rem; top: 5%; font-weight: bold; }
+        .heading-text.center { left: 50%; transform: translateX(-50%); }
+        .heading-text.left { left: 25%; }
+        .heading-text.right { right: 25%; }
+
+        /* Route et Avion */
+        .flight-path-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+        }
+        /* Ligne Verte Pointillée */
+        .flight-path-line {
+            position: absolute; bottom: 15%; left: 50%;
+            width: 2px; height: 60%;
+            background: linear-gradient(to top, transparent 50%, transparent 50%);
+            border-left: 2px dashed var(--color-green);
+            transform-origin: bottom center;
+            transform: rotate(15deg); /* Légère inclinaison pour réalisme */
+        }
+        .waypoint {
+            position: absolute; top: 25%; right: 35%;
+            color: var(--color-green); font-size: 0.7rem;
+        }
+        .waypoint::before {
+            content: "◆"; display: block; text-align: center; font-size: 1rem;
+        }
+
+        /* Symbole Avion (Jaune en bas) */
+        .aircraft-symbol {
+            position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+        }
+        .ac-cross {
+            width: 20px; height: 20px;
+            border-top: 2px solid #FFD700;
+            border-right: 2px solid #FFD700;
+            border-left: 2px solid transparent;
+            border-bottom: 2px solid transparent;
+            transform: rotate(-45deg); /* Forme de flèche/delta */
+            box-shadow: 2px -2px 0 black; /* Petit contour pour contraste */
+        }
+        /* Ligne verticale avion */
+        .ac-cross::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 26px; height: 2px;
+            background: #FFD700; transform: rotate(45deg); transform-origin: top left;
+        }
+
         /* Mobile */
         @media (max-width: 900px) {
             .screens-container { grid-template-columns: 1fr; }
@@ -337,12 +432,34 @@
                 </div>
 
                 <div class="display-unit">
-                    <div class="screen-glass">
-                        <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#444; font-size:0.8rem;">
-                            ND - MAP MODE
+                    <div class="screen-glass nd-screen">
+                        <div class="nd-corner top-left">
+                            <span class="label">GS</span> <span class="value">450</span><br>
+                            <span class="label">TAS</span> <span class="value">462</span>
+                        </div>
+                        <div class="nd-corner top-right">
+                            <span class="value">230</span><span class="unit">/</span><span class="value">12</span><span class="unit">KT</span><br>
+                            <span class="label">WIND</span>
+                        </div>
+
+                        <div class="compass-arc-container">
+                            <div class="compass-arc"></div>
+                            <div class="compass-ticks"></div>
+                            <div class="heading-pointer">▼</div>
+                            <div class="heading-text left">30</div>
+                            <div class="heading-text center">33</div>
+                            <div class="heading-text right">0</div>
+                        </div>
+
+                        <div class="flight-path-container">
+                            <div class="flight-path-line"></div>
+                            <div class="waypoint">WPT1</div>
+                            <div class="aircraft-symbol">
+                                <div class="ac-cross"></div>
+                            </div>
                         </div>
                     </div>
-                    <div style="color:#555; text-align:center; font-size:0.7rem; margin-top:5px;">ND - NAVIGATION DISPLAY</div>
+                    <div style="color:#555; text-align:center; font-size:0.6rem; margin-top:3px;">ND - NAV DISPLAY</div>
                 </div>
             </div>
 
