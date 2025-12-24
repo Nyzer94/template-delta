@@ -87,6 +87,17 @@
             overflow: hidden; /* Important pour contenir les enfants */
         }
 
+        .left-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+        }
+        .left-stack .display-unit {
+            flex: 1; 
+            min-height: 0; /* Important pour le scroll/flex */
+        }
+
         .display-unit {
             background-color: var(--bezel-color);
             border-radius: 12px;
@@ -288,40 +299,51 @@
 
         <div class="screens-container">
             
-            <div class="display-unit">
-                <div class="screen-glass">
-                    <div class="fma-grid">
-                        <div class="fma-col"><span class="mode-active">SPD</span></div>
-                        <div class="fma-col"><span class="mode-active">NAV</span><span class="mode-armed" style="font-size:0.6rem;">LOC</span></div>
-                        <div class="fma-col"></div>
-                        <div class="fma-col"><span class="mode-active">ALT</span><span class="mode-magenta">FL350</span></div>
-                        <div class="fma-col"><span class="mode-box mode-active">AP1+2</span></div>
-                    </div>
-
-                    <div class="pfd-center">
-                        <div class="horizon"></div>
-                        
-                        <div class="speed-tape">
-                            <span class="magenta-bug">V1</span><span>320</span><span style="color:var(--color-green);">300</span><span>280</span>
-                        </div>
-                        <div class="alt-tape">
-                            <span class="magenta-bug">FL350</span><span>36000</span><span style="color:var(--color-green);">35500</span><span>35000</span>
+            <div class="left-stack">
+                <div class="display-unit">
+                    <div class="screen-glass">
+                        <div class="fma-grid">
+                            <div class="fma-col"><span class="mode-active">SPD</span></div>
+                            <div class="fma-col"><span class="mode-active">NAV</span><span class="mode-armed" style="font-size:0.6rem;">LOC</span></div>
+                            <div class="fma-col"></div>
+                            <div class="fma-col"><span class="mode-active">ALT</span><span class="mode-magenta">FL350</span></div>
+                            <div class="fma-col"><span class="mode-box mode-active">AP1+2</span></div>
                         </div>
 
-                        <div class="pilot-info-overlay">
-                            <div class="pilot-name">{{NOM}}</div>
-                            <div class="pilot-role">{{TITRE_PROFIL}}</div>
-                            <div class="pilot-bio">
-                                >> {{DESCRIPTION_PROFIL}}
+                        <div class="pfd-center">
+                            <div class="horizon"></div>
+                            
+                            <div class="speed-tape">
+                                <span class="magenta-bug">V1</span><span>320</span><span style="color:var(--color-green);">300</span><span>280</span>
+                            </div>
+                            <div class="alt-tape">
+                                <span class="magenta-bug">FL350</span><span>36000</span><span style="color:var(--color-green);">35500</span><span>35000</span>
+                            </div>
+
+                            <div class="pilot-info-overlay">
+                                <div class="pilot-name">{{NOM}}</div>
+                                <div class="pilot-role">{{TITRE_PROFIL}}</div>
+                                <div class="pilot-bio">
+                                    >> {{DESCRIPTION_PROFIL}}
+                                </div>
+                            </div>
+
+                            <div class="heading-tape">
+                                <span>W</span> ... <span>300</span> ... <span style="color:var(--color-green);">315</span> ... <span>330</span>
                             </div>
                         </div>
+                    </div>
+                    <div style="color:#555; text-align:center; font-size:0.7rem; margin-top:5px;">PFD - CAPT SIDE</div>
+                </div>
 
-                        <div class="heading-tape">
-                            <span>W</span> ... <span>300</span> ... <span style="color:var(--color-green);">315</span> ... <span>330</span>
+                <div class="display-unit">
+                    <div class="screen-glass">
+                        <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#444; font-size:0.8rem;">
+                            ND - MAP MODE
                         </div>
                     </div>
+                    <div style="color:#555; text-align:center; font-size:0.7rem; margin-top:5px;">ND - NAVIGATION DISPLAY</div>
                 </div>
-                <div style="color:#555; text-align:center; font-size:0.7rem; margin-top:5px;">PFD - CAPT SIDE</div>
             </div>
 
             <div class="display-unit">
