@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITRE_DU_SITE}} // FLIGHT DECK MASTER</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=B612+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           1. VARIABLES & PALETTE
+        ========================================= */
+        :root {
+            --cockpit-grey: #2B2B2B;
+            --screen-black: #050505;
+            --bezel-color: #151515;
+            
+            /* Airbus Colors */
+            --pfd-sky: #0072BB;
+            --pfd-gnd: #573618;
+            --color-green: #37D643;     /* Normal / Active */
+            --color-cyan: #2BC4F5;      /* Info / Values */
+            --color-magenta: #D946EF;   /* Constraints */
+            --color-amber: #FF9900;     /* Caution */
+            --color-red: #FF0000;       /* Warning */
+            --color-white: #EDECEC;
+            
+            --glass-glare: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 100%);
+        }
+
+        /* =========================================
+           2. STRUCTURE GLOBALE (FIXED)
+        ========================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #0b0b0b;
+            color: var(--color-white);
+            font-family: 'B612 Mono', monospace;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Empêche tout scroll de page global */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Panneau Principal */
+        .main-panel {
+            background-color: var(--cockpit-grey);
+            border-top: 5px solid #444;
+            border-radius: 20px 20px 0 0;
+            padding: 30px;
+            width: 95vw;
+            max-width: 1400px;
+            height: 92vh; /* Hauteur fixe pour tenir dans l'écran */
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-rows: 1fr auto; /* Ecrans (flex) / Footer (auto) */
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Vis déco */
+        .panel-screw {
+            position: absolute; width: 14px; height: 14px;
+            background: radial-gradient(circle, #555, #111);
+            border-radius: 50%;
+        }
+        .panel-screw::after { content: "+"; color: #222; position: absolute; top: -3px; left: 2px; font-size: 14px; }
+
+        /* Conteneur Écrans */
+        .screens-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 100%;
+            overflow: hidden; /* Important pour contenir les enfants */
+        }
+
+        .display-unit {
+            background-color: var(--bezel-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Prend toute la hauteur de la grille */
+        }
+
+        .screen-glass {
+            background-color: var(--screen-black);
+            flex-grow: 1;
+            border: 2px solid #333;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px black;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Reflets */
+        .screen-glass::after { content: ""; position: absolute; inset: 0; background: var(--glass-glare); pointer-events: none; z-index: 10; }
+        .screen-glass::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 3px); pointer-events: none; z-index: 9; }
+
+        /* =========================================
+           3. ÉCRAN GAUCHE : PFD (PRO STYLE)
+        ========================================= */
+        .fma-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            border-bottom: 2px solid var(--color-white);
+            height: 40px; margin-bottom: 10px; flex-shrink: 0;
+        }
+        .fma-col {
+            border-right: 1px solid #444; padding: 2px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            font-size: 0.75rem; font-weight: bold;
+        }
+        .mode-active { color: var(--color-green); }
+        .mode-armed { color: var(--color-cyan); }
+        .mode-box { border: 1px solid var(--color-white); padding: 0 4px; }
+
+        .pfd-center {
+            position: relative; flex-grow: 1;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Horizon */
+        .horizon {
+            position: absolute; top: 10%; left: 15%; width: 70%; height: 70%;
+            background: linear-gradient(to bottom, var(--pfd-sky) 50%, var(--pfd-gnd) 50%);
+            border: 1px solid #666; opacity: 0.5; z-index: 0;
+        }
+        .horizon::after {
+            content: ""; position: absolute; top: 50%; left: 20%; width: 60%; height: 2px;
+            background: #FFD700; box-shadow: 0 0 5px #FFD700; transform: translateY(-50%);
+        }
+
+        /* Tapes */
+        .speed-tape, .alt-tape {
+            position: absolute; top: 10%; bottom: 20%; width: 12%;
+            background: rgba(20,20,20,0.8);
+            display: flex; flex-direction: column; justify-content: space-around;
+            font-weight: bold; font-size: 0.9rem; z-index: 2;
+        }
+        .speed-tape { left: 0; border-right: 2px solid white; text-align: right; padding-right: 5px; color: white; }
+        .alt-tape { right: 0; border-left: 2px solid white; text-align: left; padding-left: 5px; color: var(--color-green); }
+        .magenta-bug { color: var(--color-magenta); font-size: 0.7rem; }
+
+        /* Overlay Info */
+        .pilot-info-overlay {
+            z-index: 5; text-align: center;
+            background: rgba(0,0,0,0.7); padding: 15px;
+            border: 1px solid var(--color-cyan); max-width: 85%;
+        }
+        .pilot-name { font-size: 1.6rem; color: var(--color-white); letter-spacing: 2px; margin-bottom: 5px; }
+        .pilot-role { font-size: 0.9rem; color: var(--color-cyan); margin-bottom: 10px; }
+        .pilot-bio { font-size: 0.8rem; color: var(--color-green); line-height: 1.4; text-align: left; }
+
+        /* Heading */
+        .heading-tape {
+            position: absolute; bottom: 0; left: 20%; width: 60%; height: 30px;
+            border-top: 2px solid white; display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 1.1rem;
+        }
+
+        /* =========================================
+           4. ÉCRAN DROIT : HYBRIDE (CAS Messages + Logs)
+        ========================================= */
+        .ecam-container {
+            display: flex; flex-direction: column; height: 100%;
+        }
+
+        /* Section Haut : PROJETS (Style Cases/Messages) */
+        .ecam-upper {
+            flex: 0 0 50%; /* Prend 50% de la hauteur */
+            border-bottom: 2px solid var(--color-white);
+            padding: 15px;
+            overflow-y: auto; /* Scroll si trop de projets */
+        }
+        
+        /* Titres sections */
+        .ecam-title {
+            color: var(--color-white); text-decoration: underline; 
+            font-size: 0.85rem; margin-bottom: 15px; display: block;
+        }
+
+        /* Style "CAS Message" (Boites) */
+        .cas-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #111; border: 1px solid #444;
+            padding: 10px; margin-bottom: 8px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .cas-box:hover { background: #222; border-color: var(--color-cyan); }
+        
+        .cas-info h4 { color: var(--color-white); font-size: 0.9rem; margin-bottom: 2px; }
+        .cas-info span { color: var(--color-green); font-size: 0.75rem; }
+        .cas-status { color: var(--color-cyan); font-size: 0.8rem; font-weight: bold; }
+        .cas-status.amber { color: var(--color-amber); }
+
+        /* Section Bas : STAGES (Style Logs) */
+        .ecam-lower {
+            flex: 1; /* Prend le reste */
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            display: grid; grid-template-columns: 60px 1fr;
+            margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 5px;
+        }
+        .log-date { color: var(--color-cyan); font-size: 0.8rem; padding-top: 2px;}
+        .log-content { display: flex; flex-direction: column; }
+        .log-company { color: var(--color-white); font-weight: bold; font-size: 0.9rem; }
+        .log-role { color: var(--color-green); font-size: 0.8rem; }
+        .log-details { color: #888; font-size: 0.75rem; margin-top: 2px; }
+
+        /* =========================================
+           5. FOOTER (CONTROLS)
+        ========================================= */
+        .control-panel {
+            background: #222; border-top: 2px solid #111;
+            padding: 10px;
+            display: flex; justify-content: center; gap: 30px; align-items: center;
+            height: 80px; flex-shrink: 0;
+        }
+
+        .master-warn-btn {
+            background: #600; color: #aaa; border: 3px solid #400;
+            width: 70px; height: 50px;
+            display: flex; justify-content: center; align-items: center; text-align: center;
+            font-weight: bold; font-size: 0.75rem; cursor: pointer;
+            box-shadow: 0 5px 10px black;
+            animation: warning-flash 0.8s infinite;
+        }
+        @keyframes warning-flash { 50% { background: #FF0000; color: white; box-shadow: 0 0 15px #FF0000; } }
+
+        .fcu-knob {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: conic-gradient(#333 0deg, #111 90deg, #333 180deg, #111 270deg);
+            border: 2px solid #555; box-shadow: 0 5px 10px black; position: relative;
+        }
+        .fcu-knob::after { content: ""; position: absolute; top: 5px; left: 23px; width: 4px; height: 20px; background: white; }
+
+        .push-btn {
+            background: #151515; color: #ddd; border: 1px solid #444; border-bottom: 4px solid black;
+            padding: 10px 20px; font-family: 'B612 Mono'; font-size: 0.8rem;
+            cursor: pointer; text-transform: uppercase;
+        }
+        .push-btn:active { border-bottom: 1px solid black; transform: translateY(3px); }
+
+        /* =========================================
+           6. MODALES
+        ========================================= */
+        dialog {
+            inset: 0; margin: auto; background: #101010; border: 2px solid var(--color-cyan);
+            color: var(--color-white); width: 600px; max-width: 90%;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9); font-family: 'B612 Mono';
+        }
+        dialog::backdrop { background: rgba(0,0,0,0.8); backdrop-filter: blur(2px); }
+        .modal-header { background: var(--color-cyan); color: black; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; }
+        .modal-body { padding: 30px; }
+        .cl-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 10px 0; }
+        
+        /* Mobile */
+        @media (max-width: 900px) {
+            .screens-container { grid-template-columns: 1fr; }
+            .display-unit:last-child { display: none; } /* On cache l'écran de droite sur mobile pour pas casser */
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-panel">
+        <div class="panel-screw" style="top: 10px; left: 10px;"></div>
+        <div class="panel-screw" style="top: 10px; right: 10px;"></div>
+
+        <div class="screens-container">
+            
+            <div class="display-unit">
+                <div class="screen-glass">
+                    <div class="fma-grid">
+                        <div class="fma-col"><span class="mode-active">SPD</span></div>
+                        <div class="fma-col"><span class="mode-active">NAV</span><span class="mode-armed" style="font-size:0.6rem;">LOC</span></div>
+                        <div class="fma-col"></div>
+                        <div class="fma-col"><span class="mode-active">ALT</span><span class="mode-magenta">FL350</span></div>
+                        <div class="fma-col"><span class="mode-box mode-active">AP1+2</span></div>
+                    </div>
+
+                    <div class="pfd-center">
+                        <div class="horizon"></div>
+                        
+                        <div class="speed-tape">
+                            <span class="magenta-bug">V1</span><span>320</span><span style="color:var(--color-green);">300</span><span>280</span>
+                        </div>
+                        <div class="alt-tape">
+                            <span class="magenta-bug">FL350</span><span>36000</span><span style="color:var(--color-green);">35500</span><span>35000</span>
+                        </div>
+
+                        <div class="pilot-info-overlay">
+                            <div class="pilot-name">{{NOM}}</div>
+                            <div class="pilot-role">{{TITRE_PROFIL}}</div>
+                            <div class="pilot-bio">
+                                >> {{DESCRIPTION_PROFIL}}
+                            </div>
+                        </div>
+
+                        <div class="heading-tape">
+                            <span>W</span> ... <span>300</span> ... <span style="color:var(--color-green);">315</span> ... <span>330</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="color:#555; text-align:center; font-size:0.7rem; margin-top:5px;">PFD - CAPT SIDE</div>
+            </div>
+
+            <div class="display-unit">
+                <div class="screen-glass">
+                    <div class="ecam-container">
+                        
+                        <div class="ecam-upper">
+                            <span class="ecam-title">E/WD : ACTIVE PROJECTS</span>
+                            
+                            <div class="cas-box" onclick="document.getElementById('modal-projects').showModal()">
+                                <div class="cas-info">
+                                    <h4>DRONE DESIGN</h4>
+                                    <span>Analyse aérodynamique (CFD)</span>
+                                </div>
+                                <div class="cas-status">COMPLETED</div>
+                            </div>
+
+                            <div class="cas-box">
+                                <div class="cas-info">
+                                    <h4>PROPULSION</h4>
+                                    <span>Optimisation Moteur-fusée</span>
+                                </div>
+                                <div class="cas-status">ACTIVE</div>
+                            </div>
+
+                            <div class="cas-box" onclick="document.getElementById('modal-others').showModal()">
+                                <div class="cas-info">
+                                    <h4>{{TITRE_AUTRE_CATEGORIE}}</h4>
+                                    <span>Archives & Logs</span>
+                                </div>
+                                <div class="cas-status amber">CHECK</div>
+                            </div>
+                        </div>
+
+                        <div class="ecam-lower">
+                            <span class="ecam-title">SD : FLIGHT LOGS (STAGES)</span>
+                            
+                            <div class="log-entry">
+                                <span class="log-date">2024</span>
+                                <div class="log-content">
+                                    <span class="log-company">AIRBUS ATLANTIC</span>
+                                    <span class="log-role">Stage Ingénieur Méthodes (6 mois)</span>
+                                    <span class="log-details">> Optimisation des flux de production A320.</span>
+                                </div>
+                            </div>
+
+                            <div class="log-entry">
+                                <span class="log-date">2023</span>
+                                <div class="log-content">
+                                    <span class="log-company">SAFRAN AIRCRAFT</span>
+                                    <span class="log-role">Assistant R&D - Matériaux</span>
+                                    <span class="log-details">> Tests de fatigue sur composites carbone.</span>
+                                </div>
+                            </div>
+
+                             <div class="log-entry" style="border:none;">
+                                <span class="log-date">2022</span>
+                                <div class="log-content">
+                                    <span class="log-company">THALES AVIONICS</span>
+                                    <span class="log-role">Découverte Systèmes</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div style="color:#555; text-align:center; font-size:0.7rem; margin-top:5px;">ECAM - SYS DISPLAY</div>
+            </div>
+
+        </div>
+
+        <div class="control-panel">
+            <div class="master-warn-btn" onclick="alert('READY FOR TAKEOFF')">MASTER<br>WARN</div>
+            
+            <div style="text-align:center;">
+                <div class="fcu-knob"></div>
+                <div style="font-size:0.6rem; color:#666; margin-top:3px;">SPD</div>
+            </div>
+
+            <div style="display:flex; gap:15px;">
+                <button class="push-btn" onclick="window.location.href='mailto:{{EMAIL}}'">VHF 1 (EMAIL)</button>
+                <button class="push-btn" onclick="window.open('{{LINKEDIN_URL}}')">ACARS (LINKEDIN)</button>
+                <button class="push-btn" onclick="window.location.href='mentions.html'">LEGAL</button>
+            </div>
+
+            <div style="text-align:center;">
+                <div class="fcu-knob"></div>
+                <div style="font-size:0.6rem; color:#666; margin-top:3px;">ALT</div>
+            </div>
+        </div>
+
+    </main>
+
+    <dialog id="modal-projects">
+        <div class="modal-header">
+            <span>ECAM ACTION : DRONE PROJECT</span>
+            <span style="cursor: pointer;" onclick="document.getElementById('modal-projects').close()">[ CLR ]</span>
+        </div>
+        <div class="modal-body">
+            <div class="cl-row">
+                <span>YEAR</span> <span style="color:var(--color-green)">2024</span>
+            </div>
+            <div class="cl-row">
+                <span>STATUS</span> <span style="color:var(--color-green)">SUCCESS</span>
+            </div>
+            <p style="margin-top:20px; line-height:1.6; color:#ccc;">
+                Conception complète d'un drone tactique. Simulation des contraintes aérodynamiques sous ANSYS Fluent.
+            </p>
+            <button class="push-btn" style="width:100%; margin-top:20px; border-bottom:2px solid #333;">DOWNLOAD TECH SPECS (PDF)</button>
+        </div>
+    </dialog>
+
+    <dialog id="modal-others">
+        <div class="modal-header">
+            <span>ECAM ACTION : ARCHIVES</span>
+            <span style="cursor: pointer;" onclick="document.getElementById('modal-others').close()">[ CLR ]</span>
+        </div>
+        <div class="modal-body"><p>Logs secondaires...</p></div>
+    </dialog>
+
+</body>
+</html>
