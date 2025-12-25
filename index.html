@@ -176,7 +176,7 @@
             margin-top: 10px; /* Espace avec l'écran du dessus */
             border-radius: 4px;
             box-shadow: inset 0 0 10px black;
-            flex-shrink: ; /* Ne doit pas être écrasé */
+            flex-shrink: 0; /* Ne doit pas être écrasé */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -404,6 +404,14 @@
         <div class="screens-container">
             
             <div class="left-stack">
+                <div class="pilot-id-plate">
+                    <div class="pilot-name">{{NOM}}</div>
+                    <div class="pilot-role">{{TITRE_PROFIL}}</div>
+                    <div class="pilot-bio">
+                        >> {{DESCRIPTION_PROFIL}}
+                    </div>
+                </div>
+                
                 <div class="display-unit">
                     <div class="screen-glass">
                         <div class="fma-grid">
@@ -433,6 +441,7 @@
                 </div>
 
                 <div class="display-unit">
+            
                     <div class="screen-glass nd-screen">
                         <div class="nd-corner top-left">
                             <span class="label">GS</span> <span class="value">450</span><br>
@@ -463,13 +472,7 @@
                     <div style="color:#555; text-align:center; font-size:0.6rem; margin-top:3px;">ND - NAV DISPLAY</div>
                 </div>
 
-                <div class="pilot-id-plate">
-                    <div class="pilot-name">{{NOM}}</div>
-                    <div class="pilot-role">{{TITRE_PROFIL}}</div>
-                    <div class="pilot-bio">
-                        >> {{DESCRIPTION_PROFIL}}
-                    </div>
-                </div>
+                
             </div>
 
             <div class="display-unit">
@@ -592,3 +595,4 @@
 
 </body>
 </html>
+<!-- End of file -->
